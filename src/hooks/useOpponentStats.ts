@@ -10,8 +10,6 @@ export interface OpponentStat {
   winRate: number;
 }
 
-// ... existing useStats hook ...
-
 export const useOpponentStats = () => {
   return useQuery({
     queryKey: ["stats-opponents"],
