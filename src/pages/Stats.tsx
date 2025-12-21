@@ -1,18 +1,11 @@
 import { useStats } from "../hooks/useStats";
 import { match } from "ts-pattern";
-import {
-  Trophy,
-  History,
-  Percent,
-  Users,
-  ChartLine,
-  Sword,
-} from "lucide-react";
+import { Trophy, History, Percent, Users, ChartLine } from "lucide-react";
 import { StatsCard } from "../components/StatsCard";
 import { OpponentBreakdown } from "../components/OpponentBreakdown";
 
 export const Stats = () => {
-  const { data: stats, isLoading } = useStats();
+  const { data: stats } = useStats();
 
   if (!stats) return null;
 

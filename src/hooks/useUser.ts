@@ -1,5 +1,4 @@
 import {
-  useQuery,
   useMutation,
   useQueryClient,
   useSuspenseQuery,
@@ -18,7 +17,8 @@ const fetchUser = async (): Promise<User | null> => {
   try {
     const { data } = await api.get("/auth/me");
     return data.user;
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error(error);
     // If 401 (Unauthorized), we return null (not logged in)
     // We do NOT want to throw an error here, or the UI will crash
     return null;

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 export const RecordMatch = () => {
   const navigate = useNavigate();
-  const { data: opponents, isLoading: loadingOpponents } = useOpponents();
+  const { data: opponents } = useOpponents();
   const { mutate: createMatch, isPending } = useCreateMatch();
 
   const [opponentId, setOpponentId] = useState<string>("");

@@ -4,12 +4,10 @@ import { MatchCard } from "../components/MatchCard";
 import { Leaderboard } from "../components/Leaderboard";
 import { Link } from "react-router-dom";
 import { useLeaderboard } from "../hooks/useLeaderboard";
-import { History, Trophy } from "lucide-react";
-import { StatsCard } from "../components/StatsCard";
 import { useUser } from "../hooks/useUser";
 
 export const Dashboard = () => {
-  const { data: matches, isLoading } = useMatches();
+  const { data: matches } = useMatches();
   const { data: players } = useLeaderboard();
   const { data: user } = useUser();
 
