@@ -1,65 +1,52 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
+// context/AuthContext.tsx
+import { createContext, useContext, type ReactNode } from "react";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../api/axios";
 
-// 1. Define the shape of your User (matches the backend response)
-interface User {
+export type User = {
   id: number;
   username: string;
-  email: string;
-  elo: number;
-}
+};
 
+export const fetchCurrentUser = async (): Promise<User | null> => {
+  try {
+    const { data } = await api.get<User>("/auth/me");
+
+    return data;
+  } catch (error) {
+    return null;
+  }
+};
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
-  login: (userData: User) => void;
-  logout: () => void;
-  checkAuth: () => Promise<void>;
+  login: (data: { username: string; password: string }) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  // 2. Function to check if we are already logged in (runs on page load)
-  const checkAuth = async () => {
-    try {
-      const { data } = await api.get("/auth/me");
-      setUser(data.user);
-    } catch (error) {
-      console.error(error);
-      setUser(null); // Not logged in
-    } finally {
-      setIsLoading(false);
-    }
+  const { data: user } = useSuspenseQuery({
+    queryKey: ["authUser"],
+    queryFn: fetchCurrentUser,
+    staleTime: 1000 * 60 * 10,
+    retry: false,
+  });
+
+  const login = async (payload: { username: string; password: string }) => {
+    await api.post("/auth/login", payload);
+    await queryClient.invalidateQueries({ queryKey: ["authUser"] });
   };
 
-  // 3. Run checkAuth on mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const login = (userData: User) => setUser(userData);
-
   const logout = async () => {
-    try {
-      await api.post("/auth/logout");
-      setUser(null);
-    } catch (err) {
-      console.error(err);
-    }
+    await api.post("/auth/logout");
+    queryClient.setQueryData(["authUser"], null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -67,6 +54,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
+};
+
+export const useUser = (): User => {
+  const context = useAuth();
+  if (!context.user) {
+    throw new Error("useCurrentUser called in a guest context");
+  }
+  return context.user;
 };

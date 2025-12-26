@@ -1,27 +1,35 @@
-// client/src/App.tsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
-import { Dashboard } from "./pages/Dashboard";
+import { Layout } from "./components/Layout/index";
+import { Home } from "./pages/Home";
 import { RecordMatch } from "./pages/RecordMatch";
-import { Stats } from "./pages/Stats";
-import { ProtectedRouteWall } from "./components/ProtecteRouteWall";
+import { CreateGroup } from "./pages/CreateGroup";
+import { Group } from "./pages/Group";
+import { AuthenticationWall } from "./walls/AuthenticationWall";
+import { GroupWall } from "./walls/GroupWall";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-        <Route element={<ProtectedRouteWall />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/matches/new" element={<RecordMatch />} />
-          <Route path="/stats" element={<Stats />} />
+      <Route element={<AuthenticationWall />}>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+
+          <Route path="/group/new" element={<CreateGroup />} />
+
+          <Route path="/group/:id" element={<GroupWall />}>
+            <Route index element={<Group />} />
+            <Route path="matches/new" element={<RecordMatch />} />
+          </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 

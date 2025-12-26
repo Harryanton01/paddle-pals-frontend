@@ -1,21 +1,29 @@
 import { useState } from "react";
-import { Navigate, Link } from "react-router-dom"; // Added Link
-import { useRegister, useUser } from "../hooks/useUser";
+import { useMutation } from "@tanstack/react-query";
+import api from "src/api/axios";
+import { Navigate, Link, useNavigate } from "react-router-dom";
+import { useAuth } from "src/context/AuthContext";
 
 export const Register = () => {
-  const { data: user } = useUser();
-  const { mutate: register, isPending } = useRegister();
-
-  const [email, setEmail] = useState("");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { mutate: registerMutation, isPending } = useMutation({
+    mutationFn: async (payload: { username: string; password: string }) => {
+      await api.post("/auth/register", payload);
+    },
+    onSuccess: () => {
+      navigate("/login");
+    },
+  });
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  // If already logged in, redirect to dashboard
+  // If already logged in, redirect to home
   if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    register({ email, username, password });
+    registerMutation({ username, password });
   };
 
   return (
@@ -24,24 +32,13 @@ export const Register = () => {
         onSubmit={handleSubmit}
         className="bg-gray-800 p-8 rounded-lg w-96 space-y-4 shadow-xl border border-gray-700"
       >
-        <h1 className="text-2xl font-bold text-center mb-6 text-blue-400">
-          Create Account
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-6">Create Account</h1>
 
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-3 rounded bg-gray-700 border border-gray-600 focus:border-blue-500 outline-none transition-colors"
-          required
-        />
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
           className="w-full p-3 rounded bg-gray-700 border border-gray-600 focus:border-blue-500 outline-none transition-colors"
           required
         />
