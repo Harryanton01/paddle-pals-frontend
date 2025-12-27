@@ -2,14 +2,21 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "src/context/AuthContext";
+import { useNotification } from "src/hooks/useNotification";
 
 export const Login = () => {
   const { user, login } = useAuth();
+  const { addErrorNotification } = useNotification();
+
   const { mutate: loginMutation, isPending } = useMutation({
     mutationFn: async (payload: { username: string; password: string }) => {
       await login(payload);
     },
+    onError: (error) => {
+      addErrorNotification(error);
+    },
   });
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 

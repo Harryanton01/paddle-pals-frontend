@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import clsx from "clsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "../../api/axios";
+import { useNotification } from "src/hooks/useNotification";
+import api from "src/api/axios";
 
 type FormValues = {
   inviteCode: string;
@@ -11,6 +12,7 @@ type FormValues = {
 export const JoinGroupButton = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const queryClient = useQueryClient();
+  const { addErrorNotification } = useNotification();
 
   const { mutate: joinGroup, isPending } = useMutation({
     mutationFn: async (inviteCode: string) => {
@@ -19,6 +21,9 @@ export const JoinGroupButton = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myGroups"] });
+    },
+    onError: (error) => {
+      addErrorNotification(error);
     },
   });
 
@@ -53,7 +58,7 @@ export const JoinGroupButton = () => {
   return (
     <div
       className={clsx(
-        "transition-all duration-300 ease-in-out h-full flex items-center", // Force alignment
+        "transition-all duration-300 ease-in-out h-full flex items-center",
         isExpanded ? "w-full md:w-auto" : "w-auto"
       )}
     >

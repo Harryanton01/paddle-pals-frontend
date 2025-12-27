@@ -8,6 +8,7 @@ import { CreateGroup } from "./pages/CreateGroup";
 import { Group } from "./pages/Group";
 import { AuthenticationWall } from "./walls/AuthenticationWall";
 import { GroupWall } from "./walls/GroupWall";
+import { NotFound } from "./pages/NotFound";
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

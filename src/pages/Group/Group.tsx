@@ -7,7 +7,7 @@ import {
   ChartNoAxesCombinedIcon,
   HistoryIcon,
 } from "lucide-react";
-import { ToastContainer, toast } from "react-toastify";
+import { useNotification } from "src/hooks/useNotification";
 import { match } from "ts-pattern";
 import clsx from "clsx";
 
@@ -19,14 +19,12 @@ export const Group = () => {
     "history" | "stats" | "leaderboard"
   >("history");
   const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
+  const { addNotification } = useNotification();
 
   const handleCopyInviteCode = () => {
     if (group?.inviteCode) {
       navigator.clipboard.writeText(group.inviteCode);
-      toast.success("Invite code copied!", {
-        position: "bottom-right",
-        theme: "dark",
-      });
+      addNotification("Invite code copied!", "success");
     }
   };
 
@@ -38,8 +36,6 @@ export const Group = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <ToastContainer />
-
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">

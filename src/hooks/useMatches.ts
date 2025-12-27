@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useGroup } from "src/context/GroupContext";
 import api from "src/api/axios";
+import { useNotification } from "src/hooks/useNotification";
 
 export type MatchPayload = {
   gameId: number;
@@ -20,6 +21,7 @@ export const useCreateMatch = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { group } = useGroup();
+  const { addErrorNotification } = useNotification();
 
   return useMutation({
     mutationFn: async (payload: MatchPayload) => {
@@ -29,6 +31,9 @@ export const useCreateMatch = () => {
       await queryClient.invalidateQueries({ queryKey: ["matches"] });
 
       navigate(`/group/${group.id}`);
+    },
+    onError: (error) => {
+      addErrorNotification(error);
     },
   });
 };

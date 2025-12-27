@@ -4,6 +4,7 @@ import { type GroupList } from "src/hooks/useGroups";
 import { ErrorBoundary } from "react-error-boundary";
 import { UsersIcon, GamepadIcon, ListIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ErrorState } from "src/components/ErrorState";
 import { JoinGroupButton, Spinner } from "src/components";
 import api from "src/api/axios";
 
@@ -74,11 +75,11 @@ export const Home = () => {
   return (
     <div className="space-y-8">
       <ErrorBoundary
-        fallback={
-          <div className="bg-gray-900 text-white p-4">Error loading groups</div>
-        }
+        fallbackRender={({ error, resetErrorBoundary }) => (
+          <ErrorState error={error} onRetry={resetErrorBoundary} />
+        )}
       >
-        <Suspense fallback={<Spinner size="lg" />}>
+        <Suspense fallback={<Spinner size="lg" centered />}>
           <Content />
         </Suspense>
       </ErrorBoundary>

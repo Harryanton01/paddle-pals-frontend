@@ -1,8 +1,10 @@
 import { useState, Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import dayjs from "dayjs";
 import clsx from "clsx";
 import { useGroupMatches, type Match } from "./useGroupMatches";
 import { useUser } from "src/context/AuthContext";
+import { ErrorState } from "src/components/ErrorState";
 import { Spinner } from "src/components";
 import { NoMatchesPlayed } from "../../components";
 
@@ -115,14 +117,20 @@ export const MatchHistory = ({
         </div>
       </div>
 
-      <Suspense fallback={<Spinner />}>
-        <MatchList
-          page={page}
-          setPage={setPage}
-          gameId={selectedGameId}
-          filter={showOnlyMyMatches ? "mine" : "all"}
-        />
-      </Suspense>
+      <ErrorBoundary
+        fallbackRender={({ error, resetErrorBoundary }) => (
+          <ErrorState error={error} onRetry={resetErrorBoundary} />
+        )}
+      >
+        <Suspense fallback={<Spinner />}>
+          <MatchList
+            page={page}
+            setPage={setPage}
+            gameId={selectedGameId}
+            filter={showOnlyMyMatches ? "mine" : "all"}
+          />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 };

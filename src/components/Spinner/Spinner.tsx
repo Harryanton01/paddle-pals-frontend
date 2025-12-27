@@ -3,6 +3,7 @@ import clsx from "clsx";
 interface SpinnerProps {
   size?: "sm" | "md" | "lg";
   className?: string;
+  centered?: boolean;
 }
 
 const sizes = {
@@ -11,11 +12,19 @@ const sizes = {
   lg: "h-16 w-16",
 };
 
-export const Spinner = ({ size = "md", className }: SpinnerProps) => {
+export const Spinner = ({
+  size = "md",
+  className,
+  centered = false,
+}: SpinnerProps) => {
   return (
     <div className={clsx("flex justify-center items-center", className)}>
       <svg
-        className={clsx("animate-spin text-teal-500", sizes[size])}
+        className={clsx(
+          "animate-spin text-teal-500",
+          sizes[size],
+          centered && "min-h-screen"
+        )}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -39,9 +48,8 @@ export const Spinner = ({ size = "md", className }: SpinnerProps) => {
   );
 };
 
-// A Full Screen version for the initial app load
 export const FullScreenSpinner = () => (
-  <div className="h-screen w-screen flex items-center justify-center bg-gray-900">
+  <div className="h-screen w-screen flex items-center justify-center bg-gray-950">
     <Spinner size="lg" />
   </div>
 );

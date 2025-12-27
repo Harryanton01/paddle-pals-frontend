@@ -2,16 +2,19 @@ import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+import { useNotification } from "src/hooks/useNotification";
 import api from "src/api/axios";
 
 export const CreateGroup = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { addErrorNotification } = useNotification();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<{ name: string }>();
+
   const { mutate: createGroup, isPending } = useMutation({
     mutationFn: async (formValues: { name: string }) => {
       const response = await api.post("/groups", formValues);
@@ -20,6 +23,9 @@ export const CreateGroup = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["myGroups"] });
       navigate("/");
+    },
+    onError: (error) => {
+      addErrorNotification(error);
     },
   });
 

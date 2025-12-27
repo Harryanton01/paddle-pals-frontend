@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import clsx from "clsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNotification } from "src/hooks/useNotification";
 import api from "src/api/axios";
 import { useGroup } from "src/context/GroupContext";
 
@@ -13,6 +14,7 @@ export const CreateGameButton = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const queryClient = useQueryClient();
   const { group } = useGroup();
+  const { addErrorNotification } = useNotification();
 
   const { mutate: createGame, isPending } = useMutation({
     mutationFn: async (name: string) => {
@@ -25,6 +27,9 @@ export const CreateGameButton = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["group", String(group.id)] });
+    },
+    onError: (error) => {
+      addErrorNotification(error);
     },
   });
 

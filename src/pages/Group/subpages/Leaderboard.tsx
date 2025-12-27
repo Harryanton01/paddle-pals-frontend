@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import clsx from "clsx";
+import { ErrorBoundary } from "react-error-boundary";
 import { useGameStats } from "src/hooks/useStats";
 import { useUser } from "src/context/AuthContext";
 import { NoGameSelected, NoMatchesPlayed } from "../components";
-import { Spinner } from "src/components";
+import { Spinner, ErrorState } from "src/components";
 
 const Content = ({ selectedGameId }: { selectedGameId: number }) => {
   const user = useUser();
@@ -116,8 +117,14 @@ export const Leaderboard = ({
   }
 
   return (
-    <Suspense fallback={<Spinner />}>
-      <Content selectedGameId={selectedGameId} />
-    </Suspense>
+    <ErrorBoundary
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorState error={error} onRetry={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<Spinner />}>
+        <Content selectedGameId={selectedGameId} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };

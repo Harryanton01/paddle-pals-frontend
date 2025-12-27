@@ -1,6 +1,8 @@
 import { useMyGameStats } from "src/hooks/useStats";
 import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { Spinner, StatsCard } from "src/components";
+import { ErrorState } from "src/components/ErrorState";
 import { WinLossDraw, NoGameSelected, NoMatchesPlayed } from "../components";
 import { useGroup } from "src/context/GroupContext";
 import {
@@ -145,8 +147,14 @@ export const MyStats = ({
     return <NoGameSelected />;
   }
   return (
-    <Suspense fallback={<Spinner />}>
-      <StatsContent gameId={selectedGameId} />
-    </Suspense>
+    <ErrorBoundary
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <ErrorState error={error} onRetry={resetErrorBoundary} />
+      )}
+    >
+      <Suspense fallback={<Spinner />}>
+        <StatsContent gameId={selectedGameId} />
+      </Suspense>
+    </ErrorBoundary>
   );
 };

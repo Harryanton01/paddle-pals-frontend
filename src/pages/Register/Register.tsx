@@ -3,10 +3,13 @@ import { useMutation } from "@tanstack/react-query";
 import api from "src/api/axios";
 import { Navigate, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "src/context/AuthContext";
+import { useNotification } from "src/hooks/useNotification";
 
 export const Register = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { addErrorNotification } = useNotification();
+
   const { mutate: registerMutation, isPending } = useMutation({
     mutationFn: async (payload: { username: string; password: string }) => {
       await api.post("/auth/register", payload);
@@ -14,7 +17,11 @@ export const Register = () => {
     onSuccess: () => {
       navigate("/login");
     },
+    onError: (error) => {
+      addErrorNotification(error);
+    },
   });
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
