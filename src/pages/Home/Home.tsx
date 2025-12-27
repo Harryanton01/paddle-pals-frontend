@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { type GroupList } from "src/hooks/useGroups";
 import { ErrorBoundary } from "react-error-boundary";
-import { UsersIcon, GamepadIcon, ListIcon, UserPlusIcon } from "lucide-react";
+import { UsersIcon, GamepadIcon, ListIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { JoinGroupButton, Spinner } from "src/components";
 import api from "src/api/axios";
