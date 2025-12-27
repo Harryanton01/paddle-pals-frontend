@@ -1,53 +1,18 @@
 import { Suspense } from "react";
 import clsx from "clsx";
-import { useGroup } from "src/context/GroupContext";
 import { useGameStats } from "src/hooks/useStats";
-import { ChartBarIcon } from "lucide-react";
 import { useUser } from "src/context/AuthContext";
-import { Spinner, CreateGameButton } from "src/components";
+import { NoGameSelected, NoMatchesPlayed } from "../components";
+import { Spinner } from "src/components";
 
 const Content = ({ selectedGameId }: { selectedGameId: number }) => {
   const user = useUser();
   const { data: stats } = useGameStats(selectedGameId);
 
+  if (stats.overview.totalMatches === 0) return <NoMatchesPlayed />;
+
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">
-            Total Matches
-          </p>
-          <p className="text-2xl font-black text-white">
-            {stats.overview.totalMatches}
-          </p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
-          <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">
-            Active Players
-          </p>
-          <p className="text-2xl font-black text-white">
-            {stats.overview.totalPlayers}
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-400">
-            <tbody className="divide-y divide-gray-700">
-              {stats.leaderboard.map((player) => (
-                <tr
-                  key={player.userId}
-                  className={clsx(
-                    "hover:bg-gray-700/50 transition-colors",
-                    player.userId === user.id && "bg-teal-900/10"
-                  )}
-                ></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
       <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden shadow-lg">
         <div className="px-6 py-4 border-b border-gray-700 bg-gray-800/50">
           <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -146,32 +111,8 @@ export const Leaderboard = ({
 }: {
   selectedGameId: number | null;
 }) => {
-  const { group } = useGroup();
-
-  if (!group.games || group.games.length === 0) {
-    return (
-      <div className="items-center justify-center py-10 flex flex-col gap-4">
-        No games found.
-        <CreateGameButton />
-      </div>
-    );
-  }
-
   if (!selectedGameId) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-gray-900/30 rounded-xl border border-dashed border-gray-800">
-        <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
-          <ChartBarIcon className="w-8 h-8 text-gray-600" />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-white">Select a Game</h3>
-          <p className="text-gray-500 text-sm max-w-xs mx-auto">
-            Please select a specific game (e.g., Pool, Darts) from the top menu
-            to view its leaderboard.
-          </p>
-        </div>
-      </div>
-    );
+    return <NoGameSelected />;
   }
 
   return (

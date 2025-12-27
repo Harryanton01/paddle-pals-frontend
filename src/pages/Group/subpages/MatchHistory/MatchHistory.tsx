@@ -2,8 +2,9 @@ import { useState, Suspense } from "react";
 import dayjs from "dayjs";
 import clsx from "clsx";
 import { useGroupMatches, type Match } from "./useGroupMatches";
-import { useUser } from "../../../../context/AuthContext";
-import { Spinner } from "../../../../components";
+import { useUser } from "src/context/AuthContext";
+import { Spinner } from "src/components";
+import { NoMatchesPlayed } from "../../components";
 
 type MatchListProps = {
   page: number;
@@ -24,18 +25,14 @@ const MatchList = ({ page, setPage, gameId, filter }: MatchListProps) => {
   const matches = data?.data || [];
   const meta = data?.meta;
 
+  if (matches.length === 0) return <NoMatchesPlayed />;
+
   return (
     <>
       <div className="space-y-4 animate-in fade-in duration-300">
-        {matches.length === 0 ? (
-          <div className="text-center py-10 text-gray-500 bg-gray-900/50 rounded-lg border border-dashed border-gray-800">
-            No matches found for this filter.
-          </div>
-        ) : (
-          matches.map((match) => (
-            <MatchCard key={match.id} match={match} currentUserId={user.id} />
-          ))
-        )}
+        {matches.map((match) => (
+          <MatchCard key={match.id} match={match} currentUserId={user.id} />
+        ))}
       </div>
 
       {meta && meta.totalPages > 1 && (

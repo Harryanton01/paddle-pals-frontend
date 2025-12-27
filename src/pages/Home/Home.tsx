@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { type GroupList } from "src/hooks/useGroups";
 import { ErrorBoundary } from "react-error-boundary";
-import { UsersIcon, GamepadIcon, ListIcon } from "lucide-react";
+import { UsersIcon, GamepadIcon, ListIcon, UserPlusIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { JoinGroupButton, Spinner } from "src/components";
 import api from "src/api/axios";
@@ -56,7 +56,6 @@ const Content = () => {
         </Link>
       ))}
 
-      {/* "Add New" Card */}
       <Link
         to="/group/new"
         className="flex flex-col items-center justify-center p-6 bg-gray-900/50 border border-dashed border-gray-700 rounded-xl hover:bg-gray-800/50 hover:border-gray-500 transition-all cursor-pointer text-gray-500 hover:text-white"
@@ -64,6 +63,9 @@ const Content = () => {
         <span className="text-4xl mb-2">+</span>
         <span className="font-medium">Create New Group</span>
       </Link>
+      <div className="flex flex-col items-center justify-center p-6 bg-gray-900/50 border border-dashed border-gray-700 rounded-xl hover:bg-gray-800/50 hover:border-gray-500 transition-all cursor-pointer text-gray-500 hover:text-white">
+        <JoinGroupButton />
+      </div>
     </div>
   );
 };

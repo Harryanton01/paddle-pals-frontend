@@ -39,16 +39,17 @@ export function mapFormValuesToPayload(data: MatchFormValues): MatchPayload {
   };
 }
 
-const MatchFormContent = ({ onSubmit }: { onSubmit: () => void }) => {
+const MatchFormContent = ({
+  onSubmit,
+  isSubmitting,
+}: {
+  onSubmit: () => void;
+  isSubmitting: boolean;
+}) => {
   const { group } = useGroup();
   const [isScoreAvailable, setScoreAvailability] = useState(false);
 
-  const {
-    register,
-    setValue,
-    watch,
-    formState: { isSubmitting },
-  } = useFormContext<MatchFormValues>();
+  const { register, setValue, watch } = useFormContext<MatchFormValues>();
 
   const gameId = watch("gameId");
   const outcome = watch("outcome");
@@ -61,8 +62,6 @@ const MatchFormContent = ({ onSubmit }: { onSubmit: () => void }) => {
     gameId && outcome && teamAIds.length > 0 && teamBIds.length > 0;
 
   const hasGames = group?.games?.length > 0;
-
-  // --- Helper Functions ---
 
   const getAvailablePlayers = () => {
     return opponents.filter(
@@ -157,48 +156,55 @@ const MatchFormContent = ({ onSubmit }: { onSubmit: () => void }) => {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-8">
-          <div className="flex justify-end gap-4 items-center bg-gray-900/50 p-4 rounded-lg">
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <span
-                className={clsx(
-                  "text-sm font-medium",
-                  outcome === "draw" ? "text-yellow-400" : "text-gray-400"
-                )}
-              >
-                🤝 Draw Match
-              </span>
-              <div
-                className={clsx(
-                  "w-12 h-6 rounded-full p-1 transition-colors duration-300",
-                  outcome === "draw" ? "bg-yellow-500" : "bg-gray-600"
-                )}
-                onClick={toggleDraw}
-              >
+          <div className="flex justify-end md:justify-between gap-4 items-center bg-gray-900/50 p-4 rounded-lg">
+            <div className="hidden md:block">
+              {group?.games.find((g) => g.id === gameId)?.name}
+            </div>
+            <div className="flex justify-end gap-2 md:gap-4 items-center">
+              <label className="flex items-center space-x-1 cursor-pointer">
+                <span
+                  className={clsx(
+                    "text-sm font-medium",
+                    outcome === "draw" ? "text-yellow-400" : "text-gray-400"
+                  )}
+                >
+                  🤝 Draw
+                </span>
                 <div
                   className={clsx(
-                    "bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300",
-                    outcome === "draw" ? "translate-x-6" : "translate-x-0"
+                    "w-12 h-6 rounded-full p-1 transition-colors duration-300",
+                    outcome === "draw" ? "bg-yellow-500" : "bg-gray-600"
                   )}
-                />
-              </div>
-            </label>
-            <label className="flex items-center space-x-3 cursor-pointer">
-              <span className={clsx("text-sm font-medium")}>Enable score</span>
-              <div
-                className={clsx(
-                  "w-12 h-6 rounded-full p-1 transition-colors duration-300",
-                  isScoreAvailable ? "bg-green-500" : "bg-gray-600"
-                )}
-                onClick={toggleScoreAvailability}
-              >
+                  onClick={toggleDraw}
+                >
+                  <div
+                    className={clsx(
+                      "bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300",
+                      outcome === "draw" ? "translate-x-6" : "translate-x-0"
+                    )}
+                  />
+                </div>
+              </label>
+              <label className="flex items-center space-x-1 cursor-pointer">
+                <span className={clsx("text-sm font-medium")}>
+                  Enable score
+                </span>
                 <div
                   className={clsx(
-                    "bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300",
-                    isScoreAvailable ? "translate-x-6" : "translate-x-0"
+                    "w-12 h-6 rounded-full p-1 transition-colors duration-300",
+                    isScoreAvailable ? "bg-green-500" : "bg-gray-600"
                   )}
-                />
-              </div>
-            </label>
+                  onClick={toggleScoreAvailability}
+                >
+                  <div
+                    className={clsx(
+                      "bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300",
+                      isScoreAvailable ? "translate-x-6" : "translate-x-0"
+                    )}
+                  />
+                </div>
+              </label>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -342,7 +348,7 @@ const MatchFormContent = ({ onSubmit }: { onSubmit: () => void }) => {
             disabled={isSubmitting || !isFormValid}
             className="w-full py-4 bg-gradient-to-r from-teal-600 to-gray-600 rounded-lg font-bold text-lg hover:from-teal-500 hover:to-gray-500 transition-all disabled:opacity-50 shadow-lg"
           >
-            {isSubmitting ? "Saving match..." : "🏆 Add Match Result"}
+            {isSubmitting ? "Saving match..." : "Add Match Result"}
           </button>
         </form>
       </>
@@ -351,7 +357,7 @@ const MatchFormContent = ({ onSubmit }: { onSubmit: () => void }) => {
 
 export const RecordMatch = () => {
   const { group } = useGroup();
-  const { mutate: createMatch } = useCreateMatch();
+  const { mutate: createMatch, isPending } = useCreateMatch();
 
   const methods = useForm<MatchFormValues>({
     defaultValues: {
@@ -372,7 +378,10 @@ export const RecordMatch = () => {
     <div className="text-white flex items-flex-start justify-center p-4">
       <div className="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-3xl border border-gray-700">
         <FormProvider {...methods}>
-          <MatchFormContent onSubmit={methods.handleSubmit(onSubmit)} />
+          <MatchFormContent
+            onSubmit={methods.handleSubmit(onSubmit)}
+            isSubmitting={isPending}
+          />
         </FormProvider>
       </div>
     </div>

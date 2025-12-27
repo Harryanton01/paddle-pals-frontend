@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useGroup } from "src/context/GroupContext";
 import { Link } from "react-router-dom";
-import { CopyIcon, ChartBarIcon, ListIcon, UserIcon } from "lucide-react"; // Added icons for tabs
+import {
+  CopyIcon,
+  ChartBarIcon,
+  ChartNoAxesCombinedIcon,
+  HistoryIcon,
+} from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import { match } from "ts-pattern";
 import clsx from "clsx";
@@ -35,7 +40,6 @@ export const Group = () => {
     <div className="max-w-4xl mx-auto space-y-6">
       <ToastContainer />
 
-      {/* --- 1. HEADER --- */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
@@ -44,7 +48,7 @@ export const Group = () => {
             </h1>
             <button
               onClick={handleCopyInviteCode}
-              className="flex items-center gap-2 px-2 py-1 bg-gray-800/50 hover:bg-gray-800 text-gray-400 hover:text-white text-xs font-mono rounded border border-gray-700 transition-colors"
+              className="flex items-center gap-2 px-2 py-1 bg-gray-800/50 hover:bg-gray-800 text-gray-400 hover:text-white text-xs font-mono rounded border border-gray-700 transition-colors cursor-pointer"
               title="Copy Invite Code"
             >
               {group.inviteCode}
@@ -65,13 +69,11 @@ export const Group = () => {
         </Link>
       </div>
 
-      {/* --- GAME SELECTOR (Persistent across tabs) --- */}
       <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar border-b border-gray-800/50">
-        {/* 'All Games' Option */}
         <button
           onClick={() => setSelectedGameId(null)}
           className={clsx(
-            "px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border",
+            "px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border cursor-pointer",
             selectedGameId === null
               ? "bg-white text-black border-white"
               : "bg-gray-800 text-gray-400 border-gray-700 hover:bg-gray-700 hover:text-white"
@@ -85,7 +87,7 @@ export const Group = () => {
             key={game.id}
             onClick={() => setSelectedGameId(game.id)}
             className={clsx(
-              "px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border",
+              "px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border cursor-pointer",
               selectedGameId === game.id
                 ? "bg-teal-600 text-white border-teal-500 shadow-md shadow-teal-500/20"
                 : "bg-gray-800 text-gray-400 border-gray-700 hover:bg-gray-700 hover:text-white"
@@ -96,24 +98,23 @@ export const Group = () => {
         ))}
       </div>
 
-      {/* --- 2. TABS --- */}
       <div className="border-b border-gray-800 flex gap-6">
         <button
           onClick={() => setActiveTab("history")}
           className={clsx(
-            "pb-3 text-sm font-bold uppercase tracking-wider border-b-2 flex items-center gap-2 transition-all",
+            "pb-3 text-sm font-bold uppercase tracking-wider border-b-2 flex items-center gap-2 transition-all cursor-pointer",
             activeTab === "history"
               ? "border-teal-500 text-white"
               : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-700"
           )}
         >
-          <ListIcon className="w-4 h-4" />
-          Match Feed
+          <HistoryIcon className="w-4 h-4" />
+          History
         </button>
         <button
           onClick={() => setActiveTab("leaderboard")}
           className={clsx(
-            "pb-3 text-sm font-bold uppercase tracking-wider border-b-2 flex items-center gap-2 transition-all",
+            "pb-3 text-sm font-bold uppercase tracking-wider border-b-2 flex items-center gap-2 transition-all cursor-pointer",
             activeTab === "leaderboard"
               ? "border-teal-500 text-white"
               : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-700"
@@ -125,18 +126,17 @@ export const Group = () => {
         <button
           onClick={() => setActiveTab("stats")}
           className={clsx(
-            "pb-3 text-sm font-bold uppercase tracking-wider border-b-2 flex items-center gap-2 transition-all",
+            "pb-3 text-sm font-bold uppercase tracking-wider border-b-2 flex items-center gap-2 transition-all cursor-pointer",
             activeTab === "stats"
               ? "border-teal-500 text-white"
               : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-700"
           )}
         >
-          <UserIcon className="w-4 h-4" />
-          My Stats
+          <ChartNoAxesCombinedIcon className="w-4 h-4" />
+          Stats
         </button>
       </div>
 
-      {/* --- 3. CONTENT AREA --- */}
       <div className="min-h-[400px] animate-in fade-in duration-300">
         {content}
       </div>

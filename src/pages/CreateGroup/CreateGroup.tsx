@@ -7,8 +7,12 @@ import api from "src/api/axios";
 export const CreateGroup = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm<{ name: string }>();
-  const { mutate: createGroup } = useMutation({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ name: string }>();
+  const { mutate: createGroup, isPending } = useMutation({
     mutationFn: async (formValues: { name: string }) => {
       const response = await api.post("/groups", formValues);
       return response.data;
@@ -31,14 +35,31 @@ export const CreateGroup = () => {
         <input
           type="text"
           placeholder="Group Name"
-          {...register("name")}
-          className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+          {...register("name", {
+            required: "Group name is required",
+            minLength: {
+              value: 3,
+              message: "Name must be at least 3 characters",
+            },
+          })}
+          // <--- 4. Add Conditional Styling (Red border on error)
+          className={`w-full p-2 rounded bg-gray-700 border focus:outline-none focus:ring-2 ${
+            errors.name
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-600 focus:ring-teal-500"
+          }`}
         />
+        {errors.name && (
+          <div className="p-2 bg-red-500/10 border border-red-500/50 rounded text-red-400 text-sm text-center">
+            {errors.name.message}
+          </div>
+        )}
         <button
           type="submit"
-          className="w-full bg-teal-600 hover:bg-teal-500 py-2 rounded font-bold"
+          className="w-full bg-teal-600 hover:bg-teal-500 py-2 rounded font-bold cursor-pointer"
+          disabled={isPending || !!errors.name}
         >
-          Create Group
+          {isPending ? "Creating Group..." : "Create Group"}
         </button>
       </form>
     </div>

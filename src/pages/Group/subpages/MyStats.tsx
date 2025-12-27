@@ -1,49 +1,72 @@
 import { useMyGameStats } from "src/hooks/useStats";
 import { Suspense } from "react";
 import { Spinner, StatsCard } from "src/components";
-import { WinLossDraw } from "../components";
+import { WinLossDraw, NoGameSelected, NoMatchesPlayed } from "../components";
 import { useGroup } from "src/context/GroupContext";
 import {
-  ChartBarIcon,
-  TrophyIcon,
-  PercentIcon,
+  SwordsIcon,
   SkullIcon,
   TargetIcon,
   TrendingDown,
   TrendingUp,
+  ActivityIcon,
+  Gamepad2Icon,
+  CrosshairIcon,
+  CrownIcon,
 } from "lucide-react";
+
+const streakTypeToProps: Record<
+  "win" | "loss" | "draw",
+  {
+    label: string;
+    icon: React.ReactNode;
+  }
+> = {
+  win: {
+    label: "Wins",
+    icon: <TrendingUp className="text-teal-400" />,
+  },
+  loss: {
+    label: "Losses",
+    icon: <TrendingDown className="text-teal-400" />,
+  },
+  draw: {
+    label: "Draws",
+    icon: <TargetIcon className="text-teal-400" />,
+  },
+};
 
 const StatsContent = ({ gameId }: { gameId: number | null }) => {
   const { data } = useMyGameStats(gameId);
   const { group } = useGroup();
 
-  if (!data || !data.hasPlayed) return null;
+  if (!data || !data.hasPlayed) return <NoMatchesPlayed />;
 
   const currentGameSelected = group.games.find((g) => g.id === gameId);
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <StatsCard
           title="Rank"
           value={`#${data.rank}`}
-          icon={<TrophyIcon className="text-teal-400" />}
+          icon={<CrownIcon className="text-teal-400" />}
           description={`Out of ${group.members.length} players`}
         />
         <StatsCard
           title="ELO"
           value={data.stats.elo}
-          icon={<ChartBarIcon className="text-teal-400" />}
+          icon={<SwordsIcon className="text-teal-400" />}
           description={`For ${currentGameSelected?.name}`}
         />
         <StatsCard
           title="Win Rate"
           value={`${data.stats.winRate}%`}
-          icon={<PercentIcon className="text-teal-400" />}
+          icon={<CrosshairIcon className="text-teal-400" />}
           description={`You have a ${data.stats.winRate}% win rate`}
         />
         <StatsCard
-          title="Played"
+          title="Results"
           value={
             <div className="flex gap-1">
               <WinLossDraw result="W" prefix={<span>{data.stats.wins}</span>} />
@@ -63,7 +86,7 @@ const StatsContent = ({ gameId }: { gameId: number | null }) => {
               )}
             </div>
           }
-          icon={<ChartBarIcon className="text-teal-400" />}
+          icon={<Gamepad2Icon className="text-teal-400" />}
           description={`In ${data.stats.totalPlayed} matches`}
         />
         <StatsCard
@@ -75,35 +98,39 @@ const StatsContent = ({ gameId }: { gameId: number | null }) => {
               ))}
             </div>
           }
-          icon={<ChartBarIcon className="text-teal-400" />}
-          description="Past 5 matchess"
+          icon={<ActivityIcon className="text-teal-400" />}
+          description="Past 5 matches"
         />
-        <StatsCard
-          title="Current Streak"
-          value={`${data.streak.count} ${
-            data.streak.type === "win" ? "Wins" : "Losses"
-          }`}
-          icon={<TrophyIcon className="text-teal-400" />}
-          description={`You have a ${data.streak.count} ${
-            data.streak.type === "win" ? "win" : "loss"
-          } streak`}
-        />
-        <StatsCard
-          title="Your nightmare"
-          value={data.rivals.nemesis?.username}
-          icon={<SkullIcon className="text-teal-400" />}
-          description={`${Math.round(
-            data.rivals.nemesis?.winRate ?? 0
-          )}% win rate against ${data.rivals.nemesis?.username}`}
-        />
-        <StatsCard
-          title="Your playground"
-          value={data.rivals.bunny?.username}
-          icon={<TargetIcon className="text-teal-400" />}
-          description={`${Math.round(
-            data.rivals.bunny?.winRate ?? 0
-          )}% win rate against ${data.rivals.bunny?.username}`}
-        />
+        {data.streak.type && (
+          <StatsCard
+            title="Current Streak"
+            value={`${data.streak.count} ${
+              streakTypeToProps[data.streak.type].label
+            }`}
+            icon={streakTypeToProps[data.streak.type].icon}
+            description={`You have a ${data.streak.count} ${data.streak.type} streak`}
+          />
+        )}
+        {data.rivals.nemesis && (
+          <StatsCard
+            title="Your nightmare"
+            value={data.rivals.nemesis.username}
+            icon={<SkullIcon className="text-teal-400" />}
+            description={`${Math.round(
+              data.rivals.nemesis.winRate
+            )}% win rate against ${data.rivals.nemesis.username}`}
+          />
+        )}
+        {data.rivals.bunny && (
+          <StatsCard
+            title="Your playground"
+            value={data.rivals.bunny.username}
+            icon={<TargetIcon className="text-teal-400" />}
+            description={`${Math.round(
+              data.rivals.bunny.winRate
+            )}% win rate against ${data.rivals.bunny.username}`}
+          />
+        )}
       </div>
     </>
   );
@@ -115,20 +142,7 @@ export const MyStats = ({
   selectedGameId: number | null;
 }) => {
   if (!selectedGameId) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-gray-900/30 rounded-xl border border-dashed border-gray-800">
-        <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
-          <ChartBarIcon className="w-8 h-8 text-gray-600" />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-white">Select a Game</h3>
-          <p className="text-gray-500 text-sm max-w-xs mx-auto">
-            Please select a specific game (e.g., Pool, Darts) from the top menu
-            to view its leaderboard.
-          </p>
-        </div>
-      </div>
-    );
+    return <NoGameSelected />;
   }
   return (
     <Suspense fallback={<Spinner />}>
