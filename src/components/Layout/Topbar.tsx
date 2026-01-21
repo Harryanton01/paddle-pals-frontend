@@ -26,7 +26,7 @@ export const Topbar = () => {
           >
             <Logo className="w-8 h-8" />
             <span className="hidden sm:inline-block bg-gradient-to-r from-teal-400 to-teal-500 bg-clip-text text-transparent">
-              Rally
+              Logchamp
             </span>
           </Link>
         </div>
