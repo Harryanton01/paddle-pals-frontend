@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { Spinner, StatsCard } from "src/components";
 import { ErrorState } from "src/components/ErrorState";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 import { WinLossDraw, NoGameSelected, NoMatchesPlayed } from "../components";
 import { useGroup } from "src/context/GroupContext";
 import {
@@ -106,9 +108,8 @@ const StatsContent = ({ gameId }: { gameId: number | null }) => {
         {data.streak.type && (
           <StatsCard
             title="Current Streak"
-            value={`${data.streak.count} ${
-              streakTypeToProps[data.streak.type].label
-            }`}
+            value={`${data.streak.count} ${streakTypeToProps[data.streak.type].label
+              }`}
             icon={streakTypeToProps[data.streak.type].icon}
             description={`You have a ${data.streak.count} ${data.streak.type} streak`}
           />
@@ -143,13 +144,20 @@ export const MyStats = ({
 }: {
   selectedGameId: number | null;
 }) => {
+  const queryClient = useQueryClient();
+  const { id } = useParams<{ id: string }>();
+
   if (!selectedGameId) {
     return <NoGameSelected />;
   }
+
   return (
     <ErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => (
-        <ErrorState error={error} onRetry={resetErrorBoundary} />
+        <ErrorState error={error} onRetry={() => {
+          queryClient.resetQueries({ queryKey: ["myGameStats", id, selectedGameId] });
+          resetErrorBoundary();
+        }} />
       )}
     >
       <Suspense fallback={<Spinner />}>

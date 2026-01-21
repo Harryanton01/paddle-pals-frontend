@@ -6,6 +6,7 @@ import {
   ChartBarIcon,
   ChartNoAxesCombinedIcon,
   HistoryIcon,
+  SettingsIcon,
 } from "lucide-react";
 import { useNotification } from "src/hooks/useNotification";
 import { match } from "ts-pattern";
@@ -57,12 +58,20 @@ export const Group = () => {
           </p>
         </div>
 
-        <Link
-          to="matches/new"
-          className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-teal-500/20 transition-all flex items-center gap-2 hover:scale-105 active:scale-95"
-        >
-          <span>+ Record Match</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="matches/new"
+            className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-teal-500/20 transition-all flex items-center gap-2 hover:scale-105 active:scale-95"
+          >
+            <span>+ Record Match</span>
+          </Link>
+          <Link
+            to="settings"
+            className="bg-gray-800 hover:bg-gray-700 text-gray-400 px-4 py-2.5 rounded-lg font-bold shadow-lg shadow-gray-700/20 transition-all flex items-center gap-2 hover:scale-105 active:scale-95"
+          >
+            <SettingsIcon className="w-4 h-6" />
+          </Link>
+        </div>
       </div>
 
       <div className="flex overflow-x-auto pb-2 gap-2 no-scrollbar border-b border-gray-800/50">

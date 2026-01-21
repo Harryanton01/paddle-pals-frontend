@@ -5,6 +5,7 @@ import { Layout } from "./components/Layout/index";
 import { Home } from "./pages/Home";
 import { RecordMatch } from "./pages/RecordMatch";
 import { CreateGroup } from "./pages/CreateGroup";
+import { GroupSettings } from "./pages/Group/subpages/GroupSettings";
 import { Group } from "./pages/Group";
 import { AuthenticationWall } from "./walls/AuthenticationWall";
 import { GroupWall } from "./walls/GroupWall";
@@ -25,6 +26,7 @@ function App() {
           <Route path="/group/:id" element={<GroupWall />}>
             <Route index element={<Group />} />
             <Route path="matches/new" element={<RecordMatch />} />
+            <Route path="settings" element={<GroupSettings />} />
           </Route>
         </Route>
       </Route>

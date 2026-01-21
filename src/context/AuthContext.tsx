@@ -1,4 +1,3 @@
-// context/AuthContext.tsx
 import { createContext, useContext, type ReactNode } from "react";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import api from "../api/axios";
@@ -9,14 +8,18 @@ export type User = {
 };
 
 export const fetchCurrentUser = async (): Promise<User | null> => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
   try {
     const { data } = await api.get<User>("/auth/me");
-
     return data;
   } catch (error) {
+    localStorage.removeItem("token");
     return null;
   }
 };
+
 interface AuthContextType {
   user: User | null;
   login: (data: { username: string; password: string }) => Promise<void>;
@@ -36,12 +39,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const login = async (payload: { username: string; password: string }) => {
-    await api.post("/auth/login", payload);
-    await queryClient.invalidateQueries({ queryKey: ["authUser"] });
+    const { data } = await api.post("/auth/login", payload);
+    
+
+    localStorage.setItem("token", data.token);
+
+    queryClient.setQueryData(["authUser"], data.user);
   };
 
   const logout = async () => {
-    await api.post("/auth/logout");
+    try {
+      await api.post("/auth/logout");
+    } catch (e) {
+      // Ignore logout errors (e.g. server already thinks we are logged out)
+    }
+
+    localStorage.removeItem("token");
+
     queryClient.setQueryData(["authUser"], null);
   };
 

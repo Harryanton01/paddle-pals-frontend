@@ -22,6 +22,8 @@ export type Match = {
   scoreB: number;
 
   result: "TEAM_A_WIN" | "TEAM_B_WIN" | "DRAW";
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
+  createdBy: MatchUser;
 };
 
 type MatchResponse = {
@@ -44,7 +46,7 @@ export const useGroupMatches = ({ filter, page = 1, gameId }: MatchFilters) => {
   const { id } = useParams<{ id: string }>();
 
   return useSuspenseQuery({
-    queryKey: ["groupMatches", id, gameId, filter, page],
+    queryKey: ["matches", id, gameId, filter, page],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: page.toString(),

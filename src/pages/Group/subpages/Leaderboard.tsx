@@ -3,6 +3,8 @@ import clsx from "clsx";
 import { ErrorBoundary } from "react-error-boundary";
 import { useGameStats } from "src/hooks/useStats";
 import { useUser } from "src/context/AuthContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 import { NoGameSelected, NoMatchesPlayed } from "../components";
 import { Spinner, ErrorState } from "src/components";
 
@@ -112,6 +114,9 @@ export const Leaderboard = ({
 }: {
   selectedGameId: number | null;
 }) => {
+  const queryClient = useQueryClient();
+  const { id } = useParams<{ id: string }>();
+
   if (!selectedGameId) {
     return <NoGameSelected />;
   }
@@ -119,7 +124,15 @@ export const Leaderboard = ({
   return (
     <ErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => (
-        <ErrorState error={error} onRetry={resetErrorBoundary} />
+        <ErrorState
+          error={error}
+          onRetry={() => {
+            queryClient.resetQueries({
+              queryKey: ["groupStats", id, selectedGameId],
+            });
+            resetErrorBoundary();
+          }}
+        />
       )}
     >
       <Suspense fallback={<Spinner />}>

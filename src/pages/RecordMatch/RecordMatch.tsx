@@ -9,6 +9,7 @@ import clsx from "clsx";
 
 type MatchFormValues = {
   gameId: number | null;
+  playedAt: string;
   outcome: "teamA" | "teamB" | "draw" | null;
   teamA: {
     score: number;
@@ -25,9 +26,26 @@ export function mapFormValuesToPayload(data: MatchFormValues): MatchPayload {
 
   const outcome = data.outcome || "draw";
 
+  const now = new Date();
+  const selectedDate = new Date(data.playedAt);
+
+  const isToday =
+    selectedDate.getDate() === now.getDate() &&
+    selectedDate.getMonth() === now.getMonth() &&
+    selectedDate.getFullYear() === now.getFullYear();
+
+  let finalDateIso: string;
+
+  if (isToday) {
+    finalDateIso = now.toISOString();
+  } else {
+    finalDateIso = new Date(data.playedAt).toISOString();
+  }
+
   return {
     gameId: data.gameId,
-    result: outcome,
+    outcome,
+    playedAt: finalDateIso,
     teamA: {
       memberIds: data.teamA.members,
       score: data.teamA.score,
@@ -38,6 +56,15 @@ export function mapFormValuesToPayload(data: MatchFormValues): MatchPayload {
     },
   };
 }
+
+const getTodayDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
 
 const MatchFormContent = ({
   onSubmit,
@@ -157,8 +184,28 @@ const MatchFormContent = ({
 
         <form onSubmit={onSubmit} className="space-y-8">
           <div className="flex justify-end md:justify-between gap-4 items-center bg-gray-900/50 p-4 rounded-lg">
-            <div className="hidden md:block">
-              {group?.games.find((g) => g.id === gameId)?.name}
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              <div className="hidden md:block font-bold">
+                {group?.games.find((g) => g.id === gameId)?.name}
+              </div>
+
+              <div className="flex flex-col gap-1 w-full md:w-auto">
+                <input
+                  type="date"
+                  {...register("playedAt", { required: true })}
+                  max={getTodayDate()}
+                  onKeyDown={(e) => e.preventDefault()}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                  }}
+                  onClick={(e) => {
+                    if ("showPicker" in e.currentTarget) {
+                      e.currentTarget.showPicker();
+                    }
+                  }}
+                  className="bg-gray-800 border border-gray-600 rounded px-3 py-1 text-sm text-white outline-none caret-transparent selection:bg-transparent cursor-pointer select-none w-full hover:border-teal-500 focus:border-teal-500 transition-colors"
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-2 md:gap-4 items-center">
               <label className="flex items-center space-x-1 cursor-pointer">
@@ -365,6 +412,7 @@ export const RecordMatch = () => {
       outcome: null,
       teamA: { score: 0, members: [] },
       teamB: { score: 0, members: [] },
+      playedAt: getTodayDate(),
     },
   });
 

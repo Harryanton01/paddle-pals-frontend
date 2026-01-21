@@ -18,7 +18,7 @@ export const useNotification = () => {
     const status = (error as AxiosError)?.response?.status;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const customMessage = (error as any)?.response?.data?.message;
+    const customMessage = (error as any)?.response?.data?.error;
 
     match(status)
       .with(P.number, () => {
