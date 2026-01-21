@@ -5,7 +5,6 @@ import {
 } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useGroup } from "src/context/GroupContext";
-import { useUser } from "src/context/AuthContext";
 import api from "src/api/axios";
 import { useNotification } from "src/hooks/useNotification";
 import type { Match } from "src/pages/Group/subpages/MatchHistory/useGroupMatches";
